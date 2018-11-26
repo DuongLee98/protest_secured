@@ -12,7 +12,7 @@ let log = config.log
 var userList = {};
 var socketList = {};
 
-http.listen(3000, "0.0.0.0", function() {
+http.listen(3005, "0.0.0.0", function() {
     log('(Server) Listening to port:  ' + 3005);
 });
 
