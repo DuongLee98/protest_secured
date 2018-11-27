@@ -724,5 +724,6 @@ module.exports =
 
 	getInfoAllGroup: getInfoAllGroup,
 	getAllStudentOfGroup: getAllStudentOfGroup,
-	getInfoAllGroupStudentJoin: getInfoAllGroupStudentJoin
+	getInfoAllGroupStudentJoin: getInfoAllGroupStudentJoin,
+	getAllIdGroupStudent: getAllIdGroupStudent
 }

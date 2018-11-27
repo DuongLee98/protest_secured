@@ -609,7 +609,13 @@ function getInfoOfGroup(socket, keyin, keyout)
 					if (tuser == SK[socket.id].user)
 						ddata.control = true;
 					else
-						ddata.control = false;
+					{
+						var st = await group.getStatusGroupStudent(SK[socket.id].user, gid)
+						if (st != 0)
+							ddata.control = true;
+						else
+							ddata.control = false;
+					}
 					socket.emit(keyout, success(ddata, "success"));
 					log('(Server) '+SK[socket.id].user+'<-'+keyout+": "+JSON.stringify(ddata));
 				}
@@ -1141,28 +1147,32 @@ function getExam(socket, keyin, keyout)
 	socket.on(keyin,async function (data)
 	{
 		log('(Client) '+SK[socket.id].user+'->'+keyin+': '+JSON.stringify(data))
-		if (SK[socket.id].type != "none")
+		var eid = data.eid;
+		try
 		{
-			var eid = data.eid;
-			let existExam = await exam.existIdExam(eid)
-			socket.emit(keyout+'load', load+=16)
+			let existExam = await exam.existIdExam(eid);
 			if (existExam == true)
 			{
-				try
+				if (SK[socket.id].type == "teacher")
 				{
-					let dataExam = await exam.getExam(SK[socket.id].user, SK[socket.id].pass, eid);
-					socket.emit(keyout+'load', load+=16)
-					dataExam.tname = await account.getNameTUser(dataExam.tuser);
-					socket.emit(keyout+'load', load+=16)
-					if (dataExam.tuser == SK[socket.id].user)
+					var b = false;
+					b = await exam.getStatusTeacherExam(SK[socket.id].user, eid);
+					if (b == false)
+						b = await exam.getPublicOfExam(eid);
+					if (b == true)
 					{
-						dataAnswer = {};
+						let dataExam = await exam.getExam(SK[socket.id].user, SK[socket.id].pass, eid);
 						socket.emit(keyout+'load', load+=16)
-						dataExam.alen = await exam.getLengthAnswerOfExam(eid);
-						dataExam.aarr = await exam.getAllAnswerOfExam(dataExam.tuser, SK[socket.id].pass, eid);
-					}
-					if(dataExam.publish == false)
-					{
+						dataExam.tname = await account.getNameTUser(dataExam.tuser);
+						socket.emit(keyout+'load', load+=16)
+						if (dataExam.tuser == SK[socket.id].user)
+						{
+							dataAnswer = {};
+							socket.emit(keyout+'load', load+=16)
+							dataExam.alen = await exam.getLengthAnswerOfExam(eid);
+							dataExam.aarr = await exam.getAllAnswerOfExam(dataExam.tuser, SK[socket.id].pass, eid);
+						}
+
 						let dataGroup = await group.getInfoAllGroupTeacherManage(dataExam.tuser);
 						socket.emit(keyout+'load', load+=16)
 						let lenGroupAcc = 0;
@@ -1179,14 +1189,112 @@ function getExam(socket, keyin, keyout)
 						}
 						dataExam.lenGroupAcc = lenGroupAcc;
 						dataExam.arrGourpAcc = arrGourpAcc;
+						
+						socket.emit(keyout, success(dataExam, "success"));
+						log('(Server) '+SK[socket.id].user+'<-'+keyout+": "+JSON.stringify(dataExam));
 					}
-					
-					socket.emit(keyout, success(dataExam, "success"));
-					log('(Server) '+SK[socket.id].user+'<-'+keyout+": "+JSON.stringify(dataExam));
+					else
+					{
+						var msg = "You can't get exam, may be you don't make exam or exam aren't publishing";
+						socket.emit(keyout, error(msg))
+						log('(Server) '+SK[socket.id].user+"<-"+keyout+": "+msg)
+					}
 				}
-				catch(e)
+				else if (SK[socket.id].type == "student")
 				{
-					var msg = e;
+					var TS = await exam.getTimeStartOfExam(eid);
+					if (TIMESTAMPS()-5>=TS)
+					{
+						var b = await exam.getPublicOfExam(eid);
+						if (b==true)
+						{
+							let dataExam = await exam.getExam(SK[socket.id].user, SK[socket.id].pass, eid);
+							socket.emit(keyout+'load', load+=16)
+							dataExam.tname = await account.getNameTUser(dataExam.tuser);
+							socket.emit(keyout+'load', load+=16)
+
+							let dataGroup = await group.getInfoAllGroupTeacherManage(dataExam.tuser);
+							socket.emit(keyout+'load', load+=16)
+							let lenGroupAcc = 0;
+							let arrGourpAcc = [];
+							for (var i = 0; i<dataGroup.len; i++)
+							{
+								var st = await exam.getAcceptGroupForExam(dataExam.tuser, eid, parseInt(dataGroup.arr[i].gid));
+								socket.emit(keyout+'load', load+=16)
+								if (st==true)
+								{
+									lenGroupAcc++;
+									arrGourpAcc.push(parseInt(dataGroup.arr[i].gid));
+								}
+							}
+							dataExam.lenGroupAcc = lenGroupAcc;
+							dataExam.arrGourpAcc = arrGourpAcc;
+							socket.emit(keyout, success(dataExam, "success"));
+							log('(Server) '+SK[socket.id].user+'<-'+keyout+": "+JSON.stringify(dataExam));
+						}
+						else
+						{
+							var tuser = await exam.getTeacherExam(eid);
+							var allgroupS = await group.getAllIdGroupStudent(SK[socket.id].user);
+							var bool = [];
+							for (var i=0; i<allgroupS.length; i++)
+							{
+								bool.push(true);
+							}
+							var allaccept = await exam.getAllAcceptGroupForExam(tuser, eid, allgroupS, bool);
+							var ch = false;
+							for (var i=0; i<allaccept.length; i++)
+							{
+								if(allaccept[i] == true)
+								{
+									ch = true;
+									break;
+								}
+							}
+							if (ch == true)
+							{
+								let dataExam = await exam.getExam(SK[socket.id].user, SK[socket.id].pass, eid);
+								socket.emit(keyout+'load', load+=16)
+								dataExam.tname = await account.getNameTUser(dataExam.tuser);
+								socket.emit(keyout+'load', load+=16)
+
+								let dataGroup = await group.getInfoAllGroupTeacherManage(dataExam.tuser);
+								socket.emit(keyout+'load', load+=16)
+								let lenGroupAcc = 0;
+								let arrGourpAcc = [];
+								for (var i = 0; i<dataGroup.len; i++)
+								{
+									var st = await exam.getAcceptGroupForExam(dataExam.tuser, eid, parseInt(dataGroup.arr[i].gid));
+									socket.emit(keyout+'load', load+=16)
+									if (st==true)
+									{
+										lenGroupAcc++;
+										arrGourpAcc.push(parseInt(dataGroup.arr[i].gid));
+									}
+								}
+								dataExam.lenGroupAcc = lenGroupAcc;
+								dataExam.arrGourpAcc = arrGourpAcc;
+								socket.emit(keyout, success(dataExam, "success"));
+								log('(Server) '+SK[socket.id].user+'<-'+keyout+": "+JSON.stringify(dataExam));
+							}
+							else
+							{
+								var msg = "You can not access in exam, may be you doesn't join in group exam accept";
+								socket.emit(keyout, error(msg))
+								log('(Server) '+SK[socket.id].user+"<-"+keyout+": "+msg)
+							}
+						}
+					}
+					else
+					{
+						var msg = "Exam will open in "+TS-(TIMESTAMPS()-3);
+						socket.emit(keyout, error(msg))
+						log('(Server) '+SK[socket.id].user+"<-"+keyout+": "+msg)
+					}
+				}
+				else
+				{
+					var msg = "Must login before you get exam";
 					socket.emit(keyout, error(msg))
 					log('(Server) '+SK[socket.id].user+"<-"+keyout+": "+msg)
 				}
@@ -1198,9 +1306,9 @@ function getExam(socket, keyin, keyout)
 				log('(Server) '+SK[socket.id].user+"<-"+keyout+": "+msg)
 			}
 		}
-		else
+		catch(e)
 		{
-			var msg = "Must login before you get exam";
+			var msg = e;
 			socket.emit(keyout, error(msg))
 			log('(Server) '+SK[socket.id].user+"<-"+keyout+": "+msg)
 		}
@@ -1629,7 +1737,7 @@ function autoMask(socket, keyin, keyout)
 {
 	socket.on(keyin, async function (data){
 		log('(Client) '+SK[socket.id].user+'->'+keyin+': '+JSON.stringify(data));
-		if (SK[socket.id].user != "student")
+		if (SK[socket.id].type == "student")
 		{
 			try
 			{
@@ -1637,27 +1745,122 @@ function autoMask(socket, keyin, keyout)
 				var alen = data.alen;
 				var aarr = data.aarr;
 				var answer = await exam.getLengthAnswerOfExam(eid);
-				if (alen == aarr.length && alen == answer)
+				var existE = await exam.existIdExam(eid);
+				var existS = await account.userSExist(SK[socket.id].user);
+				if (existE == true && existS == true)
 				{
-					let d = await exam.doExamByStudent(SK[socket.id].user, SK[socket.id].pass, eid, aarr);
-					var tx = config.infoTransaction(d);
-					if (tx.status == true)
+					var pub = await exam.getPublicOfExam(eid);
+					var ddo = await exam.getStatusInDo(SK[socket.id].user, eid);
+					if (ddo == false)
 					{
-						dm = await exam.getMask(SK[socket.id].user, eid);
-						var point = Math.round(((10/alen)*dm)*1000)/1000;
-						var msg = point+"/"+10;
-						socket.emit(keyout, success(msg, "success"));
-						log('(Server) '+SK[socket.id].user+"<-"+keyout+": "+msg)
-						log('(Block ) transaction info: '+JSON.stringify(tx))
+						if (pub == false )
+						{
+							var tuser = await exam.getTeacherExam(eid);
+							var allgroupS = await group.getAllIdGroupStudent(SK[socket.id].user);
+							var bool = [];
+							for (var i=0; i<allgroupS.length; i++)
+							{
+								bool.push(true);
+							}
+							var allaccept = await exam.getAllAcceptGroupForExam(tuser, eid, allgroupS, bool);
+							var ch = false;
+							for (var i=0; i<allaccept.length; i++)
+							{
+								if(allaccept[i] == true)
+								{
+									ch = true;
+									break;
+								}
+							}
+							if (ch == true)
+							{
+								if(TIMESTAMPS()>exam.getTimeEndOfExam(eid))
+								{
+									allanw = await exam.getAllAnswerOfExam(SK[socket.id].user, SK[socket.id].pass, eid);
+									dm = await exam.compareAnswer(allanw, aarr);
+									var point = Math.round(((10/alen)*dm)*1000)/1000;
+									var msg = point+"/"+10;
+									socket.emit(keyout, success(msg, "success"));
+								}
+								else
+								{
+									let d = await exam.doExamByStudent(SK[socket.id].user, SK[socket.id].pass, eid, aarr);
+									var tx = config.infoTransaction(d);
+									if (tx.status == true)
+									{
+										var dm = await exam.getMask(SK[socket.id].user, eid);
+										var point = Math.round(((10/alen)*dm)*1000)/1000;
+										var msg = point+"/"+10;
+										socket.emit(keyout, success(msg, "success"));
+										log('(Server) '+SK[socket.id].user+"<-"+keyout+": "+msg)
+										log('(Block ) transaction info: '+JSON.stringify(tx))
+									}
+									else
+									{
+										var msg = "Error transaction";
+										socket.emit(keyout, error(msg))
+										log('(Server) '+SK[socket.id].user+"<-"+keyout+": "+msg)
+										log('(Block ) transaction info: '+JSON.stringify(tx))
+									}
+								}
+							}
+							else
+							{
+								var msg = "You can not access in exam, may be you doesn't join in group exam accept";
+								socket.emit(keyout, error(msg))
+								log('(Server) '+SK[socket.id].user+"<-"+keyout+": "+msg)
+								log('(Block ) transaction info: '+JSON.stringify(tx))
+							}
+						}
+						else
+						{
+							if(TIMESTAMPS()>exam.getTimeEndOfExam(eid))
+							{
+								allanw = await exam.getAllAnswerOfExam(SK[socket.id].user, SK[socket.id].pass, eid);
+								dm = await exam.compareAnswer(allanw, aarr);
+								var point = Math.round(((10/alen)*dm)*1000)/1000;
+								var msg = point+"/"+10;
+								socket.emit(keyout, success(msg, "success"));
+							}
+							else
+							{
+								let d = await exam.doExamByStudent(SK[socket.id].user, SK[socket.id].pass, eid, aarr);
+								var tx = config.infoTransaction(d);
+								if (tx.status == true)
+								{
+									var dm = await exam.getMask(SK[socket.id].user, eid);
+									var point = Math.round(((10/alen)*dm)*1000)/1000;
+									var msg = point+"/"+10;
+									socket.emit(keyout, success(msg, "success"));
+									log('(Server) '+SK[socket.id].user+"<-"+keyout+": "+msg)
+									log('(Block ) transaction info: '+JSON.stringify(tx))
+								}
+								else
+								{
+									var msg = "Error transaction";
+									socket.emit(keyout, error(msg))
+									log('(Server) '+SK[socket.id].user+"<-"+keyout+": "+msg)
+									log('(Block ) transaction info: '+JSON.stringify(tx))
+								}
+							}
+						}
 					}
-					
+					else
+					{
+						var msg = "You has been done the exam before";
+						socket.emit(keyout, error(msg))
+						log('(Server) '+SK[socket.id].user+"<-"+keyout+": "+msg)
+					}
+						
 				}
 				else
 				{
-					var msg = "Error with length answer?";
+					var msg = "Exam or Student doesn't exist";
 					socket.emit(keyout, error(msg))
 					log('(Server) '+SK[socket.id].user+"<-"+keyout+": "+msg)
+					log('(Block ) transaction info: '+JSON.stringify(tx))
 				}
+
 			}
 			catch (e)
 			{
@@ -1668,7 +1871,7 @@ function autoMask(socket, keyin, keyout)
 		}
 		else
 		{
-			var msg = "Must login before you get info";
+			var msg = "You are't not student";
 			socket.emit(keyout, error(msg))
 			log('(Server) '+SK[socket.id].user+"<-"+keyout+": "+msg)
 		}
@@ -1690,4 +1893,9 @@ function error(msg)
 	rpfalse.cd = 1;
 	rpfalse.msg = msg;
 	return rpfalse
+}
+
+function TIMESTAMPS()
+{
+	return parseInt(moment().valueOf()/1000, 10);
 }

@@ -916,6 +916,23 @@ function getMask(u, e)
 		});
 	})
 }
+
+function getStatusInDo(u, e)
+{
+	return new Promise(function(rs, rj)
+	{
+		doo.methods.getStatusInDo(u, e).call(function (error, result){
+			if (error)
+			{
+				return rj(error);
+			}
+			else
+			{
+				return rs(result);
+			}
+		});
+	})
+}
 //--------------------------------------------------------------------------
 
 async function getDetailExam(id)
@@ -1074,5 +1091,11 @@ module.exports =
 	getAnswerOfExam: getAnswerOfExam,
 	doExamByStudent: doExamByStudent,
 	compareAnswer: compareAnswer,
-	getMask: getMask
+	getMask: getMask,
+	getStatusInDo: getStatusInDo,
+	getTimeEndOfExam: getTimeEndOfExam,
+	getPublicOfExam: getPublicOfExam,
+	getAllAcceptGroupForExam: getAllAcceptGroupForExam,
+	getStatusTeacherExam: getStatusTeacherExam,
+	getTimeStartOfExam: getTimeStartOfExam
 }

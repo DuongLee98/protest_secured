@@ -471,6 +471,8 @@ async function getInfoAllTeacher(length)
 // userSExist("duonglee").then(console.log);
 // userTExist("xuanhuy").then(console.log);
 
+// editTeacherUser("xuanhuy", "protest", "protest", "Bui Xuan Huy", "014576504", "14752963").then(console.log);
+
 // regStudent("duonglee", "protest", "DL", "123").then(console.log);
 
 // getInfoAllStudent().then(console.log);
