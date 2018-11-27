@@ -602,7 +602,7 @@ function getInfoOfGroup(socket, keyin, keyout)
 					ddata = {};
 					ddata.tuser = tuser;
 					ddata.tname = tname;
-					ddata.gid = gid;
+					ddata.gid = parseInt(gid);
 					ddata.gname = await group.getNameGroup(gid);
 					ddata.len = len;
 					ddata.arr = arr;

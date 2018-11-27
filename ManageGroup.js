@@ -526,7 +526,7 @@ async function getInfoAllGroupTeacherManage(teacher)
 			let gname = await getNameGroup(gid);
 			let gmember = await getLengthStudentGroup(gid);
 
-			info.gid = gid;
+			info.gid = parseInt(gid);
 			info.gdate = gdate;
 			info.gname = gname;
 			info.gmember = gmember;
@@ -611,7 +611,7 @@ async function getInfoAllGroupStudentJoin(student)
 			let gname = await getNameGroup(gid);
 			let gmember = await getLengthStudentGroup(gid);
 			let userteacher = await getTeacherManage(gid);
-			info.gid = gid;
+			info.gid = parseInt(gid);
 			info.status = status;
 			info.gname = gname;
 			info.gmember = gmember;
@@ -651,7 +651,7 @@ async function getInfoAllGroup(length)
 			var tuser = await getTeacherManage(gid)
 			var gdate = await getDate(tuser, gid);
 			
-			info.item = gid;
+			info.item = parseInt(gid);
 			info.gname = gname;
 			info.tuser = tuser;
 			info.gdate = gdate;
