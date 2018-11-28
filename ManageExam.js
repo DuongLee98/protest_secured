@@ -933,6 +933,109 @@ function getStatusInDo(u, e)
 		});
 	})
 }
+
+function getLengthUserInDo(g)
+{
+	return new Promise(function(rs, rj)
+	{
+		doo.methods.getLengthUserInDo(g).call(function (error, result){
+			if (error)
+			{
+				return rj(error);
+			}
+			else
+			{
+				return rs(result);
+			}
+		});
+	})
+}
+
+function getUserInDo(u, i)
+{
+	return new Promise(function(rs, rj)
+	{
+		doo.methods.getUserInDo(u, i).call(function (error, result){
+			if (error)
+			{
+				return rj(error);
+			}
+			else
+			{
+				return rs(result);
+			}
+		});
+	})
+}
+
+function getLengthExamInDo(u)
+{
+	return new Promise(function(rs, rj)
+	{
+		doo.methods.getLengthExamInDo(u).call(function (error, result){
+			if (error)
+			{
+				return rj(error);
+			}
+			else
+			{
+				return rs(result);
+			}
+		});
+	})
+}
+
+function getExamInDo(u, i)
+{
+	return new Promise(function(rs, rj)
+	{
+		doo.methods.getExamInDo(u, i).call(function (error, result){
+			if (error)
+			{
+				return rj(error);
+			}
+			else
+			{
+				return rs(result);
+			}
+		});
+	})
+}
+
+function getAllExamStudentDo(u)
+{
+	return new Promise(function(rs, rj)
+	{
+		doo.methods.getAllExamStudentDo(u).call(function (error, result){
+			if (error)
+			{
+				return rj(error);
+			}
+			else
+			{
+				return rs(result);
+			}
+		});
+	})
+}
+
+function getAllMaskStudentDo(u, aeid)
+{
+	return new Promise(function(rs, rj)
+	{
+		doo.methods.getAllMaskStudentDo(u, aeid).call(function (error, result){
+			if (error)
+			{
+				return rj(error);
+			}
+			else
+			{
+				return rs(result);
+			}
+		});
+	})
+}
+
 //--------------------------------------------------------------------------
 
 async function getDetailExam(id)
@@ -1097,5 +1200,10 @@ module.exports =
 	getPublicOfExam: getPublicOfExam,
 	getAllAcceptGroupForExam: getAllAcceptGroupForExam,
 	getStatusTeacherExam: getStatusTeacherExam,
-	getTimeStartOfExam: getTimeStartOfExam
+	getTimeStartOfExam: getTimeStartOfExam,
+	getLengthUserInDo: getLengthUserInDo,
+	getUserInDo: getUserInDo,
+	getLengthQuestionOfExam: getLengthQuestionOfExam,
+	getLengthExamInDo: getLengthExamInDo,
+	getExamInDo: getExamInDo
 }

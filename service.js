@@ -54,6 +54,9 @@ io.on('connection', function(clientSocket){
     setAcceptListGroupForExam(clientSocket, 'setAcceptListGroupForExam', 'rsetAcceptListGroupForExam')
     makeExamByTeacher(clientSocket, 'makeExamByTeacher', 'rmakeExamByTeacher')
     autoMask(clientSocket, 'autoMask', 'rautoMask');
+
+    viewAllPointOfExam(clientSocket, 'viewAllPointOfExam', 'rviewAllPointOfExam');
+    viewAllPointOfStudent(clientSocket, 'viewAllPointOfStudent', 'rviewAllPointOfStudent');
     
     clientSocket.on('disconnect', function(){
         log('(Client) disconnected: '+ SK[clientSocket.id].user+"-"+SK[clientSocket.id].type) ;
@@ -1774,7 +1777,7 @@ function autoMask(socket, keyin, keyout)
 							}
 							if (ch == true)
 							{
-								if(TIMESTAMPS()>exam.getTimeEndOfExam(eid))
+								if(TIMESTAMPS()>await exam.getTimeEndOfExam(eid))
 								{
 									allanw = await exam.getAllAnswerOfExam(SK[socket.id].user, SK[socket.id].pass, eid);
 									dm = await exam.compareAnswer(allanw, aarr);
@@ -1814,7 +1817,7 @@ function autoMask(socket, keyin, keyout)
 						}
 						else
 						{
-							if(TIMESTAMPS()>exam.getTimeEndOfExam(eid))
+							if(TIMESTAMPS()>await exam.getTimeEndOfExam(eid))
 							{
 								allanw = await exam.getAllAnswerOfExam(SK[socket.id].user, SK[socket.id].pass, eid);
 								dm = await exam.compareAnswer(allanw, aarr);
@@ -1847,9 +1850,20 @@ function autoMask(socket, keyin, keyout)
 					}
 					else
 					{
-						var msg = "You has been done the exam before";
-						socket.emit(keyout, error(msg))
-						log('(Server) '+SK[socket.id].user+"<-"+keyout+": "+msg)
+						if(TIMESTAMPS()>await exam.getTimeEndOfExam(eid))
+						{
+							allanw = await exam.getAllAnswerOfExam(SK[socket.id].user, SK[socket.id].pass, eid);
+							dm = await exam.compareAnswer(allanw, aarr);
+							var point = Math.round(((10/alen)*dm)*1000)/1000;
+							var msg = point+"/"+10;
+							socket.emit(keyout, success(msg, "success"));
+						}
+						else
+						{
+							var msg = "You has been done the exam before";
+							socket.emit(keyout, error(msg))
+							log('(Server) '+SK[socket.id].user+"<-"+keyout+": "+msg)
+						}
 					}
 						
 				}
@@ -1876,6 +1890,112 @@ function autoMask(socket, keyin, keyout)
 			log('(Server) '+SK[socket.id].user+"<-"+keyout+": "+msg)
 		}
 	});
+}
+
+function viewAllPointOfExam(socket, keyin, keyout)
+{
+	socket.on(keyin,async function (data)
+	{
+		log('(Client) '+SK[socket.id].user+'->'+keyin+': '+JSON.stringify(data))
+		if (SK[socket.id].type != "none")
+		{
+			var eid = data.eid;
+			let existE = await exam.existIdExam(eid)
+			if (existE == true)
+			{
+				try
+				{
+					let lengthUser = await exam.getLengthUserInDo(eid);
+					let arr = [];
+					for (var i=0; i<lengthUser; i++)
+					{
+						var info = {};
+						info.user = await exam.getUserInDo(eid, i);
+						info.point = await exam.getMask(info.user, eid);
+						arr.push(info);
+					}
+					
+					var ddata = {};
+					ddata.len = lengthUser;
+					ddata.arr = arr;
+					ddata.qlen = await exam.getLengthQuestionOfExam(eid);
+					socket.emit(keyout, success(ddata, "success"));
+					log('(Server) '+SK[socket.id].user+'<-'+keyout+": "+JSON.stringify(ddata));
+				}
+				catch(e)
+				{
+					var msg = e;
+					socket.emit(keyout, error(msg))
+					log('(Server) '+SK[socket.id].user+"<-"+keyout+": "+msg)
+				}
+			}
+			else
+			{
+				var msg = "Exam doesn't exist";
+				socket.emit(keyout, error(msg))
+				log('(Server) '+SK[socket.id].user+"<-"+keyout+": "+msg)
+			}
+		}
+		else
+		{
+			var msg = "Must login before you get info";
+			socket.emit(keyout, error(msg))
+			log('(Server) '+SK[socket.id].user+"<-"+keyout+": "+msg)
+		}
+	})
+}
+
+function viewAllPointOfStudent(socket, keyin, keyout)
+{
+	socket.on(keyin,async function (data)
+	{
+		log('(Client) '+SK[socket.id].user+'->'+keyin+': '+JSON.stringify(data))
+		if (SK[socket.id].type != "none")
+		{
+			var suser = data.suser;
+			let existS = await account.userSExist(suser)
+			if (existS == true)
+			{
+				try
+				{
+					let lengthExam = await exam.getLengthExamInDo(suser);
+					let arr = [];
+					for (var i=0; i<lengthExam; i++)
+					{
+						var info = {};
+						info.eid = await exam.getExamInDo(suser, i);
+						info.point = await exam.getMask(suser, info.eid);
+						arr.push(info);
+					}
+					
+					var ddata = {};
+					ddata.len = lengthExam;
+					ddata.arr = arr;
+					ddata.qlen = await exam.getLengthQuestionOfExam(info.eid);
+					socket.emit(keyout, success(ddata, "success"));
+					log('(Server) '+SK[socket.id].user+'<-'+keyout+": "+JSON.stringify(ddata));
+				}
+				catch(e)
+				{
+					var msg = e;
+					socket.emit(keyout, error(msg))
+					log('(Server) '+SK[socket.id].user+"<-"+keyout+": "+msg)
+				}
+			}
+			else
+			{
+				var msg = "Student doesn't exist";
+				socket.emit(keyout, error(msg))
+				log('(Server) '+SK[socket.id].user+"<-"+keyout+": "+msg)
+			}
+		}
+		else
+		{
+			var msg = "Must login before you get info";
+			socket.emit(keyout, error(msg))
+			log('(Server) '+SK[socket.id].user+"<-"+keyout+": "+msg)
+		}
+	})
 }
 
 function success(data, msg)

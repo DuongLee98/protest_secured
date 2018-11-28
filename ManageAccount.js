@@ -390,9 +390,9 @@ async function getInfoAllStudent(length)
 		var info = {};
 		try
 		{
-			var item = await getSUser(i);
-			info = await getInfoStudent(item);
-			info.item = item;
+			var itemhuman = await getSUser(i);
+			info = await getInfoStudent(itemhuman);
+			info.itemhuman = itemhuman;
 			arr.push(info)
 		}
 		catch(e)
@@ -443,9 +443,9 @@ async function getInfoAllTeacher(length)
 		var info = {};
 		try
 		{
-			var item = await getTUser(i);
-			info = await getInfoTeacher(item);
-			info.item = item;
+			var itemhuman = await getTUser(i);
+			info = await getInfoTeacher(itemhuman);
+			info.itemhuman = itemhuman;
 			arr.push(info)
 		}
 		catch(e)
@@ -473,7 +473,9 @@ async function getInfoAllTeacher(length)
 
 // editTeacherUser("xuanhuy", "protest", "protest", "Bui Xuan Huy", "014576504", "14752963").then(console.log);
 
-// regStudent("duonglee", "protest", "DL", "123").then(console.log);
+// regStudent("studentbase3", "protest", "DL", "123").then(console.log);
+// regTeacher("admin", "protest", "Duong Lee", "0983236058", "174828390").then(console.log);
+
 
 // getInfoAllStudent().then(console.log);
 // getInfoAllTeacher(2).then(console.log);

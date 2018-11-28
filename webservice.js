@@ -1,5 +1,5 @@
-let student = require('./ManageStudent');
-let teacher = require('./ManageTeacher');
+
+let account = require('./ManageAccount');
 let group = require('./ManageGroup');
 let exam = require('./ManageExam');
 var config = require('./config');
@@ -8,66 +8,58 @@ let log = config.log
 
 async function login(socket, keyin, keyout, data){
 	log('(Web   ) '+socket.user+'->'+keyin+': '+JSON.stringify(data))
-	var user = data.user
-	var pass = data.pass
-	let exists = await student.userExist(user);
-	let existt = await teacher.userExist(user);
-	if (exists == true && existt == false)
-	{
-		let ppass = await student.getPassUser(user);
-		if (pass == ppass)
+		var user = data.user
+		var pass = data.pass
+		let exists = await account.userSExist(user);
+		let existt = await account.userTExist(user);
+		if (exists == true || existt == true)
 		{
-			socket.user = user;
-			socket.lg = "student";
-			log('(Server) '+socket.user+'->'+user+" - student");
-			ddata = {};
-			ddata.name = await student.getNameUser(user);
-			ddata.phone = await student.getPhoneUser(user);
-			log('(Server) '+socket.user+'<-'+keyout+": "+JSON.stringify(ddata));
-			return success(ddata, "student")
+			let info = await account.login(user, pass);
+			if (info.login == true)
+			{
+				ddata = {};
+				if (info.code == 0)
+				{
+					ddata.name = await account.getNameSUser(user);
+					ddata.phone = await account.getPhoneSUser(user);
+					
+					log('(Server) '+socket.user+'<-'+keyout+": "+JSON.stringify(ddata));
+					return success(ddata, "student");
+				}
+				else if (info.code == 1)
+				{
+					ddata.name = await account.getNameTUser(user);
+					ddata.phone = await account.getPhoneTUser(user);
+					ddata.cmnd = await account.getIcTUser(user);
+					
+					log('(Server) '+socket.user+'<-'+keyout+": "+JSON.stringify(ddata));
+					return success(ddata, "teacher");
+				}
+				else
+				{
+					var msg = "User undefined";
+					
+					log('(Server) '+socket.user+"<-"+keyout+": "+msg)
+					return error(msg)
+				}
+				
+				
+			}
+			else
+			{
+				var msg = "Password doesn't correct"
+				
+				log('(Server) '+socket.user+"<-"+keyout+": "+msg)
+				return error(msg)
+			}
 		}
 		else
 		{
-			var msg = "Password doesn't correct"
+			var msg = "User doesn't correct"
+			
 			log('(Server) '+socket.user+"<-"+keyout+": "+msg)
 			return error(msg)
 		}
-	}
-	else if (exists == false && existt == true)
-	{
-		let ppass = await teacher.getPassUser(user);
-		if (pass == ppass)
-		{
-			socket.user = user;
-			socket.lg = "teacher";
-			log('(Server) '+socket.user+'->'+user+" - teacher");
-			ddata = {};
-			ddata.name = await teacher.getNameUser(user);
-			ddata.phone = await teacher.getPhoneUser(user);
-			ddata.cmnd = await teacher.getIcUser(user);
-			log('(Server) '+socket.user+'<-'+keyout+": "+JSON.stringify(ddata));
-			return success(ddata, "teacher")	
-		}
-		else
-		{
-			var msg = "Password doesn't correct"
-			socket.emit(keyout, error(msg))
-			log('(Server) '+socket.user+"<-"+keyout+": "+msg)
-			return error(msg)
-		}
-	}
-	else if (exists == false && existt == false)
-	{
-		var msg = "User doesn't correct"
-		log('(Server) '+socket.user+"<-"+keyout+": "+msg)
-		return error(msg)
-	}
-	else
-	{
-		var msg = "Error System!"
-		log('(Server) '+socket.user+"<-"+keyout+": "+msg)
-		return error(msg)
-	}
 }
 
 async function getInfoOfTeacher(socket, keyin, keyout, data)
@@ -76,12 +68,12 @@ async function getInfoOfTeacher(socket, keyin, keyout, data)
 	if (socket.lg != "none")
 	{
 		var tuser = data.tuser;
-		let existTeacher = await teacher.userExist(tuser)
+		let existTeacher = await account.userTExist(tuser)
 		if (existTeacher == true)
 		{
 			try
 			{
-				let infoteacher = await teacher.getInfoTeacher(tuser);
+				let infoteacher = await account.getInfoTeacher(tuser);
 				log('(Server) '+socket.user+'<-'+keyout+": "+JSON.stringify(infoteacher));
 				return success(infoteacher, "success");
 				
