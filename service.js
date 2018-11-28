@@ -96,7 +96,8 @@ function login(socket, keyin, keyout)
 				{
 					ddata.name = await account.getNameTUser(user);
 					ddata.phone = await account.getPhoneTUser(user);
-					data.cmnd = await account.getIcTUser(user);
+					ddata.cmnd = await account.getIcTUser(user);
+					ddata.elen = await exam.getLengthListExam(user);
 					socket.emit(keyout, success(ddata, SK[socket.id].type));
 					log('(Server) '+SK[socket.id].user+'<-'+keyout+": "+JSON.stringify(ddata));
 				}
@@ -1118,6 +1119,7 @@ function getInfoOfTeacher(socket, keyin, keyout)
 				{
 					let infoteacher = await account.getInfoTeacher(tuser);
 					
+					infoteacher.elen = await exam.getLengthListExam(tuser);
 					socket.emit(keyout, success(infoteacher, "success"));
 					log('(Server) '+SK[socket.id].user+'<-'+keyout+": "+JSON.stringify(infoteacher));
 				}
