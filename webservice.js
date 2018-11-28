@@ -101,6 +101,46 @@ async function getInfoOfTeacher(socket, keyin, keyout, data)
 	}
 }
 
+async function getInfoOfStudent(socket, keyin, keyout, data)
+{
+	log('(Client) '+socket.user+'->'+keyin+': '+JSON.stringify(data))
+	if (socket.lg != "none")
+	{
+		var suser = data.suser;
+		let existStudent = await account.userSExist(suser)
+		if (existStudent == true)
+		{
+			try
+			{
+				let infostudent = await account.getInfoStudent(suser);
+				log('(Server) '+socket.user+'<-'+keyout+": "+JSON.stringify(infostudent));
+				
+				return success(infostudent, "success");
+				
+			}
+			catch(e)
+			{
+				var msg = e;
+				log('(Server) '+socket.user+"<-"+keyout+": "+msg)
+				return error(msg)
+				
+			}
+		}
+		else
+		{
+			var msg = "Student doesn't exist";
+			log('(Server) '+socket.user+"<-"+keyout+": "+msg)
+			return error(msg)
+		}
+	}
+	else
+	{
+		var msg = "Must login before you get info student";
+		log('(Server) '+socket.user+"<-"+keyout+": "+msg)
+		return error(msg)
+	}
+}
+
 async function getInfoAllGroupTeacherManage(socket, keyin, keyout, data){
 	log('(Client) '+socket.user+'->'+keyin+': '+JSON.stringify(data));
 	if (socket.lg != "none")
@@ -519,7 +559,7 @@ module.exports =
 	getExam: getExam,
 	getInfoAllExamAcceptForGroup: getInfoAllExamAcceptForGroup,
 	createExamByTeacher: createExamByTeacher,
-
+	getInfoOfStudent: getInfoOfStudent,
 
 	exam: exam
 }

@@ -1967,13 +1967,13 @@ function viewAllPointOfStudent(socket, keyin, keyout)
 						var info = {};
 						info.eid = await exam.getExamInDo(suser, i);
 						info.point = await exam.getMask(suser, info.eid);
+						info.qlen = await exam.getLengthQuestionOfExam(info.eid);
 						arr.push(info);
 					}
 					
 					var ddata = {};
 					ddata.len = lengthExam;
 					ddata.arr = arr;
-					ddata.qlen = await exam.getLengthQuestionOfExam(info.eid);
 					socket.emit(keyout, success(ddata, "success"));
 					log('(Server) '+SK[socket.id].user+'<-'+keyout+": "+JSON.stringify(ddata));
 				}
