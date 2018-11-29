@@ -351,7 +351,7 @@ function getLengthStudentGroup(id)
 //ManageGroup-----------------------------------------------------------------------------
 function createGroupByTeacher(user, pass, namegroup)
 {
-	log('(Server) send... deleteStudentUser' + user);
+	log('(Server) send... createGroupByTeacher' + user);
 	return new Promise(function (resolve, reject){
 		var builder = managegroup.methods.createGroupByTeacher(user, pass, namegroup).encodeABI();
 		var transaction = config.createTransaction(config.addressFrom, config.addressManageGroup, builder);
@@ -374,7 +374,7 @@ function createGroupByTeacher(user, pass, namegroup)
 
 function deleteGroupByTeacher(user, pass, id)
 {
-	log('(Server) send... deleteStudentUser' + user);
+	log('(Server) send... deleteGroupByTeacher' + user);
 	return new Promise(function (resolve, reject){
 		var builder = managegroup.methods.deleteGroupByTeacher(user, pass, id).encodeABI();
 		var transaction = config.createTransaction(config.addressFrom, config.addressManageGroup, builder);
@@ -397,7 +397,7 @@ function deleteGroupByTeacher(user, pass, id)
 
 function editGroupByTeacher(user, pass, id, newname)
 {
-	log('(Server) send... deleteStudentUser' + user);
+	log('(Server) send... editGroupByTeacher' + user);
 	return new Promise(function (resolve, reject){
 		var builder = managegroup.methods.editGroupByTeacher(user, pass, id, newname).encodeABI();
 		var transaction = config.createTransaction(config.addressFrom, config.addressManageGroup, builder);
@@ -420,7 +420,7 @@ function editGroupByTeacher(user, pass, id, newname)
 
 function groupAddOrInviteStudentByTeacher(user, pass, gid, suser)
 {
-	log('(Server) send... deleteStudentUser' + user);
+	log('(Server) send... groupAddOrInviteStudentByTeacher' + user);
 	return new Promise(function (resolve, reject){
 		var builder = managegroup.methods.groupAddOrInviteStudentByTeacher(user, pass, gid, suser).encodeABI();
 		var transaction = config.createTransaction(config.addressFrom, config.addressManageGroup, builder);
@@ -443,7 +443,7 @@ function groupAddOrInviteStudentByTeacher(user, pass, gid, suser)
 
 function groupDeleteOrRefuseStudentByTeacher(user, pass, gid, suser)
 {
-	log('(Server) send... deleteStudentUser' + user);
+	log('(Server) send... groupDeleteOrRefuseStudentByTeacher' + user);
 	return new Promise(function (resolve, reject){
 		var builder = managegroup.methods.groupDeleteOrRefuseStudentByTeacher(user, pass, gid, suser).encodeABI();
 		var transaction = config.createTransaction(config.addressFrom, config.addressManageGroup, builder);
@@ -466,7 +466,7 @@ function groupDeleteOrRefuseStudentByTeacher(user, pass, gid, suser)
 
 function studentExitOrRefuseGroup(suser, pass, gid)
 {
-	log('(Server) send... deleteStudentUser' + suser);
+	log('(Server) send... studentExitOrRefuseGroup' + suser);
 	return new Promise(function (resolve, reject){
 		var builder = managegroup.methods.studentExitOrRefuseGroup(suser, pass, gid).encodeABI();
 		var transaction = config.createTransaction(config.addressFrom, config.addressManageGroup, builder);
@@ -489,7 +489,7 @@ function studentExitOrRefuseGroup(suser, pass, gid)
 
 function studentJoinOrAcceptGroup(suser, pass, gid)
 {
-	log('(Server) send... deleteStudentUser' + suser);
+	log('(Server) send... studentJoinOrAcceptGroup' + suser);
 	return new Promise(function (resolve, reject){
 		var builder = managegroup.methods.studentJoinOrAcceptGroup(suser, pass, gid).encodeABI();
 		var transaction = config.createTransaction(config.addressFrom, config.addressManageGroup, builder);

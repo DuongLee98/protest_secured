@@ -28,21 +28,21 @@ var manageexamget = new web3.eth.Contract(config.abiManageExamGet, config.addres
 
 function createExamByTeacher(tuser, pass, ename)
 {
-	log('(Server) send... addExam');
+	log('(Server) send... createExamByTeacher');
 	return new Promise (function(resolve, reject){
 		var builder = manageexamset.methods.createExamByTeacher(tuser, pass, ename).encodeABI();
 		var transaction = config.createTransaction(config.addressFrom, config.addressManageExamSet, builder);
 		web3.eth.accounts.signTransaction(transaction, config.privateKey, function (error, signedTx) {
 		    if (error)
 		    {
-		        return reject("addExam: "+error);
+		        return reject("createExamByTeacher: "+error);
 			}
 			else
 			{
 				web3.eth.sendSignedTransaction(signedTx.rawTransaction).on('receipt', function (receipt) {
 		            return resolve(receipt);
 		 		}).on('error', function(err){
-		 			return reject("addExam: "+err);
+		 			return reject("createExamByTeacher: "+err);
 		 		})
 			}
 		});
@@ -51,21 +51,21 @@ function createExamByTeacher(tuser, pass, ename)
 
 function doExamByStudent(suser, pass, eid, aw)
 {
-	log('(Server) send... addExam');
+	log('(Server) send... doExamByStudent');
 	return new Promise (function(resolve, reject){
 		var builder = manageexamset.methods.doExamByStudent(suser, pass, eid, aw).encodeABI();
 		var transaction = config.createTransaction(config.addressFrom, config.addressManageExamSet, builder);
 		web3.eth.accounts.signTransaction(transaction, config.privateKey, function (error, signedTx) {
 		    if (error)
 		    {
-		        return reject("addExam: "+error);
+		        return reject("doExamByStudent: "+error);
 			}
 			else
 			{
 				web3.eth.sendSignedTransaction(signedTx.rawTransaction).on('receipt', function (receipt) {
 		            return resolve(receipt);
 		 		}).on('error', function(err){
-		 			return reject("addExam: "+err);
+		 			return reject("doExamByStudent: "+err);
 		 		})
 			}
 		});
@@ -167,21 +167,21 @@ function addOrSetSelectionOfQuestionInExam(tuser, pass, id, q, s, ns)
 
 function deleteExamByTeacher(tuser, pass, id)
 {
-	log('(Server) send... deleteExam');
+	log('(Server) send... deleteExamByTeacher');
 	return new Promise (function(resolve, reject){
 		var builder = manageexamset.methods.deleteExamByTeacher(id).encodeABI();
 		var transaction = config.createTransaction(config.addressFrom, config.addressManageExamSet, builder);
 		web3.eth.accounts.signTransaction(transaction, config.privateKey, function (error, signedTx) {
 		    if (error)
 		    {
-		        return reject("deleteExam: "+error);
+		        return reject("deleteExamByTeacher: "+error);
 			}
 			else
 			{
 				web3.eth.sendSignedTransaction(signedTx.rawTransaction).on('receipt', function (receipt) {
 		            return resolve(receipt);
 		 		}).on('error', function(err){
-		 			return reject("deleteExam: "+err);
+		 			return reject("deleteExamByTeacher: "+err);
 		 		})
 			}
 		});
@@ -190,21 +190,21 @@ function deleteExamByTeacher(tuser, pass, id)
 
 function editNameExam(tuser, pass, id, nn)
 {
-	log('(Server) send... editName');
+	log('(Server) send... editNameExam');
 	return new Promise (function(resolve, reject){
 		var builder = exam.methods.editNameExam(tuser, pass, id, nn).encodeABI();
 		var transaction = config.createTransaction(config.addressFrom, config.addressExam, builder);
 		web3.eth.accounts.signTransaction(transaction, config.privateKey, function (error, signedTx) {
 		    if (error)
 		    {
-		        return reject("editName: "+error);
+		        return reject("editNameExam: "+error);
 			}
 			else
 			{
 				web3.eth.sendSignedTransaction(signedTx.rawTransaction).on('receipt', function (receipt) {
 		            return resolve(receipt);
 		 		}).on('error', function(err){
-		 			return reject("editName: "+err);
+		 			return reject("editNameExam: "+err);
 		 		})
 			}
 		});
@@ -220,14 +220,14 @@ function setGeneralExam(tuser, pass, id, times, timee, subj, p)
 		web3.eth.accounts.signTransaction(transaction, config.privateKey, function (error, signedTx) {
 		    if (error)
 		    {
-		        return reject("editName: "+error);
+		        return reject("setGeneralExam: "+error);
 			}
 			else
 			{
 				web3.eth.sendSignedTransaction(signedTx.rawTransaction).on('receipt', function (receipt) {
 		            return resolve(receipt);
 		 		}).on('error', function(err){
-		 			return reject("editName: "+err);
+		 			return reject("setGeneralExam: "+err);
 		 		})
 			}
 		});

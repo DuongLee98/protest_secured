@@ -57,7 +57,7 @@ function deleteTeacherUser(user, pass)
 
 function editStudentUser(user, pass, newpass, newname, newphone)
 {
-	log('(Server) send... deleteStudentUser' + user);
+	log('(Server) send... editStudentUser' + user);
 	return new Promise(function (resolve, reject){
 		var builder = account.methods.editSUser(user, pass, newpass, newname, newphone).encodeABI();
 		var transaction = config.createTransaction(config.addressFrom, config.addressAccount, builder);
@@ -80,7 +80,7 @@ function editStudentUser(user, pass, newpass, newname, newphone)
 
 function editTeacherUser(user, pass, newpass, newname, newphone, newic)
 {
-	log('(Server) send... deleteStudentUser' + user);
+	log('(Server) send... editTeacherUser' + user);
 	return new Promise(function (resolve, reject){
 		var builder = account.methods.editTUser(user, pass, newpass, newname, newphone, newic).encodeABI();
 		var transaction = config.createTransaction(config.addressFrom, config.addressAccount, builder);
@@ -103,7 +103,7 @@ function editTeacherUser(user, pass, newpass, newname, newphone, newic)
 
 function regStudent(user, pass, name, phone)
 {
-	log('(Server) send... deleteStudentUser' + user);
+	log('(Server) send... regStudent' + user);
 	return new Promise(function (resolve, reject){
 		var builder = account.methods.regStudent(user, pass, name, phone).encodeABI();
 		var transaction = config.createTransaction(config.addressFrom, config.addressAccount, builder);
@@ -126,7 +126,7 @@ function regStudent(user, pass, name, phone)
 
 function regTeacher(user, pass, name, phone, ic)
 {
-	log('(Server) send... deleteStudentUser' + user);
+	log('(Server) send... regTeacher' + user);
 	return new Promise(function (resolve, reject){
 		var builder = account.methods.regTeacher(user, pass, phone, name, ic).encodeABI();
 		var transaction = config.createTransaction(config.addressFrom, config.addressAccount, builder);
