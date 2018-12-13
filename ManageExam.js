@@ -1206,5 +1206,6 @@ module.exports =
 	getLengthQuestionOfExam: getLengthQuestionOfExam,
 	getLengthExamInDo: getLengthExamInDo,
 	getExamInDo: getExamInDo,
-	getLengthListExam: getLengthListExam
+	getLengthListExam: getLengthListExam,
+	getTypeOfExam: getTypeOfExam
 }
